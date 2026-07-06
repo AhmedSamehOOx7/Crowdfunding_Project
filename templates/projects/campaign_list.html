@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Campaigns - Crowdfunding{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <h1 class="fw-bold mb-5">All Campaigns</h1>
+
+        <div class="row mb-5">
+            <div class="col-md-12">
+                <form method="get" class="d-flex gap-3 mb-3 flex-wrap">
+                    <input type="text" name="q" class="form-control" placeholder="Search campaigns..." value="{{ query }}">
+                    <select name="category" class="form-select" style="max-width: 200px;">
+                        <option value="">All Categories</option>
+                        {% for category in categories %}
+                        <option value="{{ category.slug }}" {% if category_slug == category.slug %}selected{% endif %}>{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <select name="filter" class="form-select" style="max-width: 200px;">
+                        <option value="">Sort By</option>
+                        <option value="newest" {% if filter_by == 'newest' %}selected{% endif %}>Newest</option>
+                        <option value="most_funded" {% if filter_by == 'most_funded' %}selected{% endif %}>Most Funded</option>
+                        <option value="ending_soon" {% if filter_by == 'ending_soon' %}selected{% endif %}>Ending Soon</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
+                </form>
+            </div>
+        </div>
+
+        {% if campaigns %}
+            <div class="row g-4">
+                {% for campaign in campaigns %}
+                    {% include "projects/_campaign_card.html" %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-5">
+                <h3 class="text-muted">No campaigns found</h3>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

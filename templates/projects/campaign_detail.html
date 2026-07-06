@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+
+{% block title %}{{ campaign.title }} - Crowdfunding{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                {% if campaign.cover_image %}
+                    <img src="{{ campaign.cover_image.url }}" class="img-fluid rounded mb-4" alt="{{ campaign.title }}">
+                {% endif %}
+                <h1 class="fw-bold mb-3">{{ campaign.title }}</h1>
+                <p class="text-muted mb-4">
+                    <i class="fas fa-user"></i> {{ campaign.owner.first_name }} {{ campaign.owner.last_name }}
+                    <span class="mx-2">•</span>
+                    <i class="fas fa-calendar"></i> {{ campaign.start_date|date:"F d, Y" }} - {{ campaign.end_date|date:"F d, Y" }}
+                </p>
+                <p>{{ campaign.story|linebreaks }}</p>
+            </div>
+            <div class="col-lg-4">
+                <div class="card sticky-top" style="top: 100px;">
+                    <div class="card-body">
+                        <h4 class="fw-bold mb-4">Donate Now</h4>
+                        
+                        <!-- Progress Bar -->
+                        <div class="progress mb-3" style="height: 10px;">
+                            <div class="progress-bar" role="progressbar" style="width: {{ funding_percentage|floatformat:"0" }}%;" aria-valuenow="{{ funding_percentage|floatformat:"0" }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        
+                        <!-- Statistics -->
+                        <div class="row text-center mb-4">
+                            <div class="col-12 mb-2">
+                                <h5 class="fw-bold text-primary">EGP {{ total_raised }}</h5>
+                                <p class="text-muted small">Raised of EGP {{ campaign.goal_amount }}</p>
+                            </div>
+                            <div class="col-6">
+                                <h6 class="fw-bold">{{ number_of_donors }}</h6>
+                                <p class="text-muted small">Donors</p>
+                            </div>
+                            <div class="col-6">
+                                <h6 class="fw-bold">{{ campaign.get_days_left }}</h6>
+                                <p class="text-muted small">Days Left</p>
+                            </div>
+                            <div class="col-12">
+                                <h6 class="fw-bold text-secondary">EGP {{ remaining_amount }}</h6>
+                                <p class="text-muted small">Remaining</p>
+                            </div>
+                        </div>
+                        
+                        {% if user.is_authenticated %}
+                            {% if user == campaign.owner %}
+                                <div class="alert alert-info" role="alert">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    This is your campaign — you cannot donate to your own campaign.
+                                </div>
+                            {% else %}
+                                {% if messages %}
+                                    {% for message in messages %}
+                                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show mb-3" role="alert">
+                                            {{ message }}
+                                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                        </div>
+                                    {% endfor %}
+                                {% endif %}
+                                {% if form.non_field_errors %}
+                                    <div class="alert alert-danger mb-3" role="alert">
+                                        {% for error in form.non_field_errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                                <form method="post" class="mb-4">
+                                    {% csrf_token %}
+                                    <div class="mb-3">
+                                        <label class="form-label">Amount (EGP)</label>
+                                        {{ form.amount }}
+                                        {% if form.amount.errors %}
+                                            <div class="text-danger small">
+                                                {% for error in form.amount.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-primary btn-lg fw-bold">Donate Now</button>
+                                    </div>
+                                </form>
+                            {% endif %}
+                        {% else %}
+                            <a href="{% url 'login' %}" class="btn btn-primary btn-lg w-100">Login to Donate</a>
+                        {% endif %}
+                        
+                        {% if campaign.owner == user %}
+                            <hr>
+                            <div class="d-grid gap-2">
+                                <a href="{% url 'campaign_edit' campaign.pk %}" class="btn btn-outline-primary">Edit Campaign</a>
+                                <a href="{% url 'campaign_delete' campaign.pk %}" class="btn btn-outline-danger">Delete Campaign</a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if donations %}
+            <div class="row mt-5">
+                <div class="col-lg-8">
+                    <h3 class="fw-bold mb-4">Recent Donations</h3>
+                    <div class="list-group">
+                        {% for donation in donations %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h6 class="mb-1">{{ donation.donor.first_name }} {{ donation.donor.last_name }}</h6>
+                                        <small class="text-muted">{{ donation.donated_at|date:"F d, Y" }}</small>
+                                    </div>
+                                    <span class="fw-bold text-primary">EGP {{ donation.amount }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
