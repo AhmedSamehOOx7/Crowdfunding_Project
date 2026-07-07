@@ -29,7 +29,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-3$wjecx7(by0awufpzhv0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['.vercel.app', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -81,8 +81,6 @@ WSGI_APPLICATION = 'crowdfunding.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-import dj_database_url
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -90,10 +88,17 @@ DATABASES = {
     }
 }
 
-# Use PostgreSQL if POSTGRES_URL is available (Vercel Postgres, Supabase, etc.)
-POSTGRES_URL = os.environ.get('POSTGRES_URL')
-if POSTGRES_URL:
-    DATABASES['default'] = dj_database_url.config(default=POSTGRES_URL, conn_max_age=600)
+# PostgreSQL setup (uncomment for production)
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': os.environ.get('DB_NAME'),
+#         'USER': os.environ.get('DB_USER'),
+#         'PASSWORD': os.environ.get('DB_PASSWORD'),
+#         'HOST': os.environ.get('DB_HOST'),
+#         'PORT': os.environ.get('DB_PORT'),
+#     }
+# }
 
 
 # Password validation
