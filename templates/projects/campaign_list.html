@@ -17,13 +17,7 @@ Campaigns - Crowdfunding
             name="q"
             class="form-control"
             placeholder="Search campaigns..."
-            {%
-            if
-            query
-            %}value="{{ query }}"
-            {%
-            endif
-            %}
+            {% if query %}value="{{ query }}"{% endif %}
           />
 
           <select name="category" class="form-select" style="max-width: 200px">
@@ -31,13 +25,7 @@ Campaigns - Crowdfunding
             {% for category in categories %}
             <option
               value="{{ category.slug }}"
-              {%
-              if
-              category_slug=""
-              ="category.slug"
-              %}selected{%
-              endif
-              %}
+              {% if category_slug == category.slug %}selected{% endif %}
             >
               {{ category.name }}
             </option>
@@ -47,37 +35,19 @@ Campaigns - Crowdfunding
             <option value="">Sort By</option>
             <option
               value="newest"
-              {%
-              if
-              filter_by=""
-              ="newest"
-              %}selected{%
-              endif
-              %}
+              {% if filter_by == "newest" %}selected{% endif %}
             >
               Newest
             </option>
             <option
               value="most_funded"
-              {%
-              if
-              filter_by=""
-              ="most_funded"
-              %}selected{%
-              endif
-              %}
+              {% if filter_by == "most_funded" %}selected{% endif %}
             >
               Most Funded
             </option>
             <option
               value="ending_soon"
-              {%
-              if
-              filter_by=""
-              ="ending_soon"
-              %}selected{%
-              endif
-              %}
+              {% if filter_by == "ending_soon" %}selected{% endif %}
             >
               Ending Soon
             </option>
@@ -94,9 +64,42 @@ Campaigns - Crowdfunding
             {% include "projects/_campaign_card.html" %}
         {% endfor %}
     </div>
+
+    <!-- Pagination -->
+    {% if campaigns.has_other_pages %}
+    <nav aria-label="Page navigation" class="mt-5">
+      <ul class="pagination justify-content-center">
+        {% if campaigns.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page=1{% if query %}&q={{ query }}{% endif %}{% if category_slug %}&category={{ category_slug }}{% endif %}{% if filter_by %}&filter={{ filter_by }}{% endif %}">First</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ campaigns.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if category_slug %}&category={{ category_slug }}{% endif %}{% if filter_by %}&filter={{ filter_by }}{% endif %}">Previous</a>
+          </li>
+        {% endif %}
+
+        <li class="page-item active">
+          <span class="page-link">
+            Page {{ campaigns.number }} of {{ campaigns.paginator.num_pages }}
+          </span>
+        </li>
+
+        {% if campaigns.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ campaigns.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if category_slug %}&category={{ category_slug }}{% endif %}{% if filter_by %}&filter={{ filter_by }}{% endif %}">Next</a>
+          </li>
+          <li class="page-item">
+            <a class="page-link" href="?page={{ campaigns.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if category_slug %}&category={{ category_slug }}{% endif %}{% if filter_by %}&filter={{ filter_by }}{% endif %}">Last</a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+    {% endif %}
 {% else %}
-    <div class="alert alert-info">
-        No campaigns found.
+    <div class="alert alert-info text-center">
+        <i class="fas fa-search-plus fa-3x mb-3"></i>
+        <h4>لا توجد حملات</h4>
+        <p>No campaigns found matching your criteria.</p>
     </div>
 {% endif %}
   </div>

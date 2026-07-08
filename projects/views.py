@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q, Sum
 from django.utils import timezone
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from datetime import datetime
 from .models import Campaign, Category, Donation
 from .forms import CampaignForm, DonationForm
@@ -46,10 +47,23 @@ def campaign_list(request):
         campaigns = campaigns.annotate(total_raised=Sum('donations__amount')).order_by('-total_raised')
     elif filter_by == 'ending_soon':
         campaigns = campaigns.order_by('end_date')
+    else:
+        campaigns = campaigns.order_by('-created_at')  # Default sorting
+
+    # Pagination: 9 campaigns per page
+    paginator = Paginator(campaigns, 9)
+    page = request.GET.get('page')
+
+    try:
+        campaigns_page = paginator.page(page)
+    except PageNotAnInteger:
+        campaigns_page = paginator.page(1)
+    except EmptyPage:
+        campaigns_page = paginator.page(paginator.num_pages)
 
     categories = Category.objects.all()
     return render(request, 'projects/campaign_list.html', {
-        'campaigns': campaigns,
+        'campaigns': campaigns_page,
         'categories': categories,
         'query': query,
         'category_slug': category_slug,

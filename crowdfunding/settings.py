@@ -159,12 +159,13 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Cloudinary configuration (optional, for production)
-# CLOUDINARY_STORAGE = {
-#     'CLOUD_NAME': os.environ.get('CLOUD_NAME'),
-#     'API_KEY': os.environ.get('CLOUD_API_KEY'),
-#     'API_SECRET': os.environ.get('CLOUD_API_SECRET'),
-# }
-# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+if os.environ.get('CLOUD_NAME') and os.environ.get('CLOUD_API_KEY') and os.environ.get('CLOUD_API_SECRET'):
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': os.environ.get('CLOUD_NAME'),
+        'API_KEY': os.environ.get('CLOUD_API_KEY'),
+        'API_SECRET': os.environ.get('CLOUD_API_SECRET'),
+    }
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Login/Logout
 LOGIN_URL = '/login/'
