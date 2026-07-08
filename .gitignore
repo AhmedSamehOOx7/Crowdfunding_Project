@@ -5,8 +5,7 @@ __pycache__/
 
 # C extensions
 *.so
-.env.example
-# Distribution / packaging
+ # Distribution / packaging
 .Python
 build/
 develop-eggs/
@@ -52,3 +51,5 @@ Thumbs.db
 .pytest_cache/
 htmlcov/
 .tox/
+.env.example
+.env
