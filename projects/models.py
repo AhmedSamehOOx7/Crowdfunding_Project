@@ -37,8 +37,11 @@ class Campaign(models.Model):
     def get_progress_percentage(self):
         if self.goal_amount == 0:
             return 0
-        percentage = (self.raised_amount / self.goal_amount) * 100
-        return round(min(100, percentage))
+        try:
+            percentage = (float(self.raised_amount) / float(self.goal_amount)) * 100
+            return round(min(100, percentage))
+        except (ZeroDivisionError, TypeError):
+            return 0
 
     def get_days_left(self):
         today = date.today()

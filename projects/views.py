@@ -70,18 +70,17 @@ def campaign_detail(request, pk):
     if request.method == 'POST' and request.user.is_authenticated:
         form = DonationForm(request.POST, campaign=campaign, user=request.user)
         if form.is_valid():
-            amount = form.cleaned_data['amount']
             donation = form.save(commit=False)
             donation.donor = request.user
             donation.campaign = campaign
             donation.save()
             
-            # Update campaign raised amount
-            campaign.raised_amount += amount
-            campaign.save()
-            
             messages.success(request, "Thank you for your donation!")
             return redirect('campaign_detail', pk=campaign.pk)
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{form.fields[field].label if field != '__all__' else 'Error'}: {error}")
     else:
         form = DonationForm(campaign=campaign, user=request.user)
         
@@ -106,6 +105,10 @@ def campaign_create(request):
             campaign.save()
             messages.success(request, 'Campaign created successfully!')
             return redirect('campaign_detail', pk=campaign.pk)
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{form.fields[field].label if field != '__all__' else 'Error'}: {error}")
     else:
         form = CampaignForm()
     categories = Category.objects.all()
@@ -124,6 +127,10 @@ def campaign_edit(request, pk):
             form.save()
             messages.success(request, 'Campaign updated successfully!')
             return redirect('campaign_detail', pk=pk)
+        else:
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{form.fields[field].label if field != '__all__' else 'Error'}: {error}")
     else:
         form = CampaignForm(instance=campaign)
     return render(request, 'projects/campaign_form.html', {'form': form, 'campaign': campaign})
